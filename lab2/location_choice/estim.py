@@ -8,7 +8,10 @@
 import numpy as np
 import pandas as pd
 import estimagic as em
-from load_data import *
+import sys, os
+sys.path.insert(0, "/home/marius/Data/0_Programme/Github_desktop_repos/2026_structural_metrics_coursework")
+from lab2.location_choice.load_data import *
+import optimagic as om
 
 pd.options.display.max_rows = 500
 

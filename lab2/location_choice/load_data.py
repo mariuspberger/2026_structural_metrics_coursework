@@ -4,7 +4,7 @@ import numpy as np
 
 def load_data(vars_loc=[],
               vars_indiv=[],
-              fname_mun='./data_mun.dta',
+              fname_mun='./lab2/ppwddata_mun.dta',
               fname_indiv='./data_indiv_sample.dta',
               verbosity=1,
               nloc=0,
