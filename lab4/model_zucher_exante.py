@@ -24,7 +24,7 @@ class zurcher():
         self.c = 2.45569                                      # Cost parameter
         self.beta = 0.9999                                    # Discount factor
 
-        # b. update baseline parameters using keywords
+        # b. update baseline parameters using keywords  # Changes attributes if any other than the default is given as input
         for key,val in kwargs.items():
             setattr(self,key,val) 
 
@@ -38,7 +38,7 @@ class zurcher():
 
     def state_transition(self):
         '''Compute transition probability matrixes conditional on choice'''
-        p = np.append(self.p,1-np.sum(self.p))
+        p = np.append(self.p,1-np.sum(self.p)) # implies that the initial p's are lower than 1?
         P1 = np.zeros((self.n,self.n))
         for i in range(self.n):
             if i <= self.n-len(p):
@@ -58,12 +58,12 @@ class zurcher():
     def bellman(self,ev0=np.zeros(1),output=1):
 
         # Value of options:
-        #value_keep = 
-        #value_replace = 
+        value_keep = - self.cost + self.beta*ev0
+        value_replace = - self.cost[0] - self.RC + self.beta*ev0[0] # [0] because if we replace we get instantaneously get values/cost of bus with x_0 = 0
 
         
         # recenter Bellman by subtracting max(VK, VR)
-        #maxV = 
+        maxV = np.maximum(value_keep, value_replace)
         logsum = (maxV + np.log(np.exp(value_keep-maxV)  +  np.exp(value_replace-maxV)))  # This is the Logsum 
         ev1 = self.P1@logsum
 
@@ -93,7 +93,7 @@ class zurcher():
         idx = data[:,0]             # bus id
         bustype = data[:,1]         # bus type
         dl = data[:,4]              # laggend replacement dummy
-        d = np.append(dl[1:], 0)    # replacement dummy
+        d = np.append(dl[1:], 0)    # replacement dummy  # [1:] ensures that we shift the replacement dummy such that it's no longer lagged
         x = data[:,6]               # Odometer
 
         # Discretize odometer data into 1,2,...,n
@@ -106,7 +106,7 @@ class zurcher():
         # change type to integrer
         x = x.astype(int)
         dx1 = dx1.astype(int)
-
+P1
         # Collect in a dataframe
         remove_first_row_index=idx-np.append(0,idx[:-1])
         data = {'id': idx,'bustype':bustype, 'd': d, 'x': x, 'dx1': dx1, 'boolean': remove_first_row_index}

@@ -1,6 +1,7 @@
 #  NFXP class for structural estimation of discrete choice models.
 
 import numpy as np
+import scipy.optimize as optimize
 import Solve_NFXP_exante as Solve
 import model_zucher_exante as zucher
 
@@ -8,7 +9,7 @@ import model_zucher_exante as zucher
 ev = np.zeros(1) # Global variable
 
 
-def estimate(model,solver,data,theta0=[0,0],twostep=0):
+def estimate(model,solver,data,theta0=[0,0],twostep=0): # theta0 = initial value of structural parameter
     global ev
     ev = np.zeros(1) 
     
@@ -23,7 +24,7 @@ def estimate(model,solver,data,theta0=[0,0],twostep=0):
     # Estimate RC and C
     pnames = ['RC','c']
     
-    res = optimize.minimize(ll,theta0,args = (model, solver, data, pnames), method = 'trust-ncg',jac = grad, hess = hes, tol=1e-8)
+    res = optimize.minimize(ll, theta0, args = (model, solver, data, pnames), method = 'trust-ncg', jac = grad, hess = hes, tol=1e-8)
     
     
     model=updatepar(model,pnames,res.x)
@@ -51,9 +52,9 @@ def ll(theta, model, solver,data, pnames, out=1): # out=1 solve optimization, ou
     global ev
     
     # Unpack
-    x = np.numpy(data.x)
-    d = np.numpy(data.d)
-    dx1 = np.numpy(data.dx1)
+    x = np.array(data.x)
+    d = np.array(data.d)
+    dx1 = np.array(data.dx1)
 
     # Update values
     model=updatepar(model,pnames,theta)
@@ -62,11 +63,11 @@ def ll(theta, model, solver,data, pnames, out=1): # out=1 solve optimization, ou
     ev0 = ev
 
     # Solve the model
-    # INSERT EQUATIONS HERE
-    
+    ev, pk, dev = solver.poly(model.bellman, V0=ev0, beta=model.beta, output=3)
     
     # Evaluate likelihood function
-    # INSERT EQUAIONS HERE
+    lik_pr = pk[x]
+    log_lik = np.log(lik_pr+(1-2*lik_pr)*d) # p+(1-2p)*d = p(1-d)+d(1-p)
     
     # add on log like for mileage process
     if theta.size>2:
